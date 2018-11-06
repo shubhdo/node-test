@@ -1,0 +1,24 @@
+{
+  "extends": "strongloop",
+  "root": true,
+  "env": {
+    "es6": true,
+    "node": true
+  },
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2017
+  },
+  "rules": {
+    "comma-dangle": 0,
+    "indent": 0,
+    "newline-per-chained-call": 0,
+    "newline-before-return": 0,
+    "function-paren-newline": 0,
+    "eol-last": 0,
+    "space-before-function-paren": 0,
+    "space-before-blocks": 0,
+    "max-len": 0,
+    "no-unused-vars": 0
+  }
+}
