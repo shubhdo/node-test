@@ -141,9 +141,9 @@ async function loginUser(req, res) {
                     data.token = token;
                     let updateLoginCountAndSaveToken =
                         await User.findByIdAndUpdate(user._id, {
-                            $inc: {
-                                loginCount: 1
-                            },
+                            // $inc: {
+                            //     loginCount: 1
+                            // },
                             $set: {
                                 token: token,
                                 otp: null

@@ -15,7 +15,6 @@ const permissionSchema = new Schema({
   },
 });
 
-
 const WishList = new Schema({
   name: {
     type: String,
@@ -28,24 +27,6 @@ const WishList = new Schema({
       ref: 'Product',
     },
   }, ],
-});
-
-const SocialLoginSchema = new Schema({
-  facebook: {
-    id: {
-      type: String
-    }
-  },
-  linkedin: {
-    id: {
-      type: String
-    }
-  },
-  twitter: {
-    id: {
-      type: String
-    }
-  }
 });
 
 const User = new Schema({
@@ -67,6 +48,11 @@ const User = new Schema({
     type: String,
     unique: true,
     required: true,
+  },
+  mobile: {
+    type: String,
+    unique: true,
+    required: true
   },
   gender: {
     type: String,
@@ -104,12 +90,7 @@ const User = new Schema({
   TwoFactorEnabled: {
     type: Boolean,
     default: false
-  },
-  socialLoginSchema: {
-    type: SocialLoginSchema,
-    default: SocialLoginSchema
   }
-
 }, {
   timestamps: true,
 });

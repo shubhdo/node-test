@@ -12,14 +12,4 @@ module.exports = app => {
         passport.authenticate('local'),
         UserController.loginUser
     );
-    app.get('/auth/linkedin',
-        passport.authenticate('linkedin'));
-
-    app.get('/auth/linkedin/callback',
-        passport.authenticate('linkedin',
-            function (req, res) {
-                console.log(req, res);
-                // Successful authentication, redirect home.
-                res.redirect('/');
-            }));
 };

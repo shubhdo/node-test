@@ -17,6 +17,7 @@ import passport from 'passport';
 import User from './models/user';
 import Session from 'express-session';
 import flash from 'connect-flash';
+import path from 'path';
 mongoose.Promise = global.Promise;
 mongoose
   .connect(
@@ -28,15 +29,16 @@ mongoose
 const app = express();
 app.use(flash());
 app.use(logger('dev'));
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(
-  bodyParser.urlencoded({
+  express.urlencoded({
     extended: true
   })
 );
 app.use(Session({
   secret: 'secret'
 }));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -52,7 +54,7 @@ app.use(function (req, res, next) {
   res.setHeader('Access-Control-Allow-Methods', '*');
   res.setHeader(
     'Access-Control-Allow-Headers',
-    'X-Requested-With,content-type, Authorization'
+    'X-Requested-With,Content-type, Authorization'
   );
   next();
 });
@@ -81,7 +83,6 @@ require('./passport-configuration');
 
 // Error handler
 app.use(function (err, req, res, next) {
-  console.log(err);
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
   res
