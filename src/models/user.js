@@ -52,7 +52,7 @@ const User = new Schema({
   mobile: {
     type: String,
     unique: true,
-    required: true
+    sparse: true
   },
   gender: {
     type: String,
@@ -61,7 +61,6 @@ const User = new Schema({
   },
   password: {
     type: String,
-    required: true,
     select: false,
     set: shaEncrypt,
   },
@@ -86,6 +85,12 @@ const User = new Schema({
   },
   otp: {
     type: String
+  },
+  provider: {
+    type: String
+  },
+  linkedin: {
+    type: Schema.Types.Mixed
   },
   TwoFactorEnabled: {
     type: Boolean,

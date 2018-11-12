@@ -12,4 +12,10 @@ module.exports = app => {
         passport.authenticate('local'),
         UserController.loginUser
     );
+    app.get('/auth/linkedin',
+        passport.authenticate('linkedin'));
+
+    app.get('/auth/linkedin/callback',
+        passport.authenticate('linkedin'),
+        UserController.sociaLoginUser);
 };

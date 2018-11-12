@@ -12,7 +12,7 @@ async function addUser(req, res) {
             email: req.body.email
         });
         if (user)
-            sendResponse(res, 500, 'User already exists');
+            sendResponse(res, 400, 'User with this email id already exists');
         else {
             req.body.speakeasy_secret = speakeasy.generateSecret({
                 length: 20
@@ -141,9 +141,9 @@ async function loginUser(req, res) {
                     data.token = token;
                     let updateLoginCountAndSaveToken =
                         await User.findByIdAndUpdate(user._id, {
-                            // $inc: {
-                            //     loginCount: 1
-                            // },
+                            $inc: {
+                                loginCount: 1
+                            },
                             $set: {
                                 token: token,
                                 otp: null
@@ -171,9 +171,44 @@ async function loginUser(req, res) {
         sendResponse(res, 500, 'Unexpected error', e);
     }
 }
+
+async function sociaLoginUser(req, res) {
+    console.log(req.user);
+    try {
+
+
+        let token = jwt.sign({
+            exp: Math.floor(Date.now() / 1000) + (60 * 60),
+            data: req.user._id
+        }, Constants.JWT_SECRET);
+        let data = req.user;
+        data.token = token;
+        let updateLoginCountAndSaveToken =
+            await User.findByIdAndUpdate(req.user._id, {
+                $inc: {
+                    loginCount: 1
+                },
+                $set: {
+                    token: token,
+                }
+            });
+        if (req.user.loginCount > 1) {
+            sendResponse(res, 200, 'Login Successful', data);
+
+        } else {
+            sendResponse(res, 206, 'Login Successful', data);
+
+        }
+
+    } catch (e) {
+        console.log(e);
+        sendResponse(res, 500, 'Unexpected error', e);
+    }
+}
 module.exports = {
     addUser,
     verifyUser,
     sendOTPLogin,
-    loginUser
+    loginUser,
+    sociaLoginUser
 };
