@@ -172,19 +172,73 @@ async function loginUser(req, res) {
     }
 }
 
+// async function sociaLoginUser(req, res) {
+//     console.log(req.user);
+//     try {
+
+
+//         let token = jwt.sign({
+//             exp: Math.floor(Date.now() / 1000) + (60 * 60),
+//             data: req.user._id
+//         }, Constants.JWT_SECRET);
+//         let data = req.user;
+//         data.token = token;
+//         let updateLoginCountAndSaveToken =
+//             await User.findByIdAndUpdate(req.user._id, {
+//                 $inc: {
+//                     loginCount: 1
+//                 },
+//                 $set: {
+//                     token: token,
+//                 }
+//             });
+//         if (req.user.loginCount > 1) {
+//             sendResponse(res, 200, 'Login Successful', data);
+
+//         } else {
+//             sendResponse(res, 206, 'Login Successful', data);
+
+//         }
+
+//     } catch (e) {
+//         console.log(e);
+//         sendResponse(res, 500, 'Unexpected error', e);
+//     }
+// }
+
 async function sociaLoginUser(req, res) {
-    console.log(req.user);
+    console.log(req.body);
+    let user = {};
     try {
+        if (req.body.social_login_provider_id) {
+            user = await User.findOne({
+                $or: [{
+                    social_login_provider_id: req.body.social_login_provider_id
+                }, {
+                    email: req.body.email
+                }]
+            });
+        } else {
+            sendResponse(res, 400, 'Please provide provider id');
+            return;
+        }
 
 
+        console.log(user);
+        if (!user) {
+            req.body.status = 'Active';
+            user = await new User(req.body).save();
+
+        }
+        console.log(user);
         let token = jwt.sign({
             exp: Math.floor(Date.now() / 1000) + (60 * 60),
-            data: req.user._id
+            data: user._id
         }, Constants.JWT_SECRET);
-        let data = req.user;
+        let data = user;
         data.token = token;
         let updateLoginCountAndSaveToken =
-            await User.findByIdAndUpdate(req.user._id, {
+            await User.findByIdAndUpdate(user._id, {
                 $inc: {
                     loginCount: 1
                 },
@@ -192,7 +246,7 @@ async function sociaLoginUser(req, res) {
                     token: token,
                 }
             });
-        if (req.user.loginCount > 1) {
+        if (user.loginCount > 0) {
             sendResponse(res, 200, 'Login Successful', data);
 
         } else {
@@ -205,10 +259,104 @@ async function sociaLoginUser(req, res) {
         sendResponse(res, 500, 'Unexpected error', e);
     }
 }
+
+async function getAllUsers(req, res) {
+    try {
+        let users = await User.find({
+            status: 'Active'
+        });
+        sendResponse(res, 200, 'Successful.', users);
+
+    } catch (e) {
+        console.log(e);
+        sendResponse(res, 500, 'Unexpected error', e);
+
+    }
+
+}
+
+async function editUser(req, res) {
+    console.log(req.body);
+    try {
+        let id = req.body.id;
+        delete req.body.id;
+        let updateUser = await User.findByIdAndUpdate(id, {
+            $set: req.body
+        }, {
+            new: true
+        });
+        sendResponse(res, 200, 'Updated Successfully.', updateUser);
+
+    } catch (e) {
+        console.log(e);
+        sendResponse(res, 500, 'Unexpected error', e);
+    }
+}
+
+async function getUser(req, res) {
+    try {
+        let user = await User.findById(req.params.id);
+        sendResponse(res, 200, 'Successful.', user);
+
+    } catch (e) {
+        console.log(e);
+        sendResponse(res, 500, 'Unexpected error', e);
+
+    }
+}
+
+
+async function deleteUser(req, res) {
+    try {
+        let id = req.body.id;
+        delete req.body.id;
+        let updateUser = await User.findByIdAndUpdate(id, {
+            $set: {
+                status: 'Inactive'
+            }
+        }, {
+            new: true
+        });
+        sendResponse(res, 200, 'Updated Successfully.', updateUser);
+
+    } catch (e) {
+        console.log(e);
+        sendResponse(res, 500, 'Unexpected error', e);
+    }
+}
+
+
+async function addUserFromAdmin(req, res) {
+    try {
+        let user = await User.findOne({
+            email: req.body.email
+        });
+        if (user)
+            sendResponse(res, 400, 'User with this email id already exists');
+        else {
+            req.body.status = 'Active';
+            let newUser = await new User(req.body).save();
+            console.log(newUser);
+            sendResponse(res, 200,
+                'Added Successfully.');
+        }
+
+    } catch (e) {
+        console.log(e);
+        sendResponse(res, 500, 'Unexpected error', e);
+    }
+}
+
+
 module.exports = {
     addUser,
     verifyUser,
     sendOTPLogin,
     loginUser,
-    sociaLoginUser
+    sociaLoginUser,
+    getAllUsers,
+    editUser,
+    getUser,
+    deleteUser,
+    addUserFromAdmin
 };

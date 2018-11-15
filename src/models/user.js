@@ -4,6 +4,16 @@ const Schema = mongoose.Schema;
 
 const statusTypes = ['Active', 'Inactive'];
 
+const Address = new Schema({
+  line1: String,
+  line2: String,
+  city: String,
+  state: String,
+  postalCode: String,
+  country: String
+});
+
+
 const permissionSchema = new Schema({
   isAdmin: {
     type: Boolean,
@@ -35,7 +45,8 @@ const User = new Schema({
     ref: 'company',
     // required: true,
   },
-  name: String,
+  firstName: String,
+  lastName: String,
   role: {
     type: String,
     enum: ['Buyer', 'Seller', 'Admin', 'SubAdmin'],
@@ -49,6 +60,10 @@ const User = new Schema({
     unique: true,
     required: true,
   },
+  address: [{
+    type: Address,
+    default: Address
+  }],
   mobile: {
     type: String,
     unique: true,
@@ -86,11 +101,11 @@ const User = new Schema({
   otp: {
     type: String
   },
-  provider: {
+  social_login_provider_id: {
     type: String
   },
-  linkedin: {
-    type: Schema.Types.Mixed
+  social_login_provider: {
+    type: String
   },
   TwoFactorEnabled: {
     type: Boolean,
